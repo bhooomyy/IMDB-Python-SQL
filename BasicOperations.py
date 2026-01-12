@@ -40,3 +40,10 @@ tvSeries=titles_data[titles_data['titleType']=='tvSeries']
 title_leftJoin_titleEpisodes=pd.merge(tvSeries[['tconst','titleType','primaryTitle']],title_episode_data[['tconst','parentTconst','seasonNumber','episodeNumber']],left_on='tconst',right_on='parentTconst',how='inner').sort_values(by='seasonNumber',ascending=False)
 ans=title_leftJoin_titleEpisodes.groupby(['parentTconst','primaryTitle']).size().reset_index(name='episode_cnt').sort_values(by='episode_cnt',ascending=False)
 print(ans[['parentTconst','primaryTitle','episode_cnt']].head(20))
+
+
+
+
+#List the top 20 people who have appeared in the highest number of titles as an actor or actress.
+people=people_data[people_data['primaryProfession'].str.contains(r'\b(actor|actress)\b', na=False)]
+print(people[['nconst','primaryName','primaryProfession']].head(20))
