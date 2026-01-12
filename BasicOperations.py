@@ -31,3 +31,12 @@ print(empty) '''
 title_leftJoin_title_ratings=pd.merge(titles_data[['tconst','titleType','primaryTitle']],title_ratings_data[['tconst','averageRating']],on='tconst',how='left')
 null_title=title_leftJoin_title_ratings[title_leftJoin_title_ratings['averageRating'].isna()]
 print(null_title[['tconst','primaryTitle','averageRating']])
+
+
+
+
+#For each TV series, calculate the total number of episodes and list the top 20 series with the most episodes.
+tvSeries=titles_data[titles_data['titleType']=='tvSeries']
+title_leftJoin_titleEpisodes=pd.merge(tvSeries[['tconst','titleType','primaryTitle']],title_episode_data[['tconst','parentTconst','seasonNumber','episodeNumber']],left_on='tconst',right_on='parentTconst',how='inner').sort_values(by='seasonNumber',ascending=False)
+ans=title_leftJoin_titleEpisodes.groupby(['parentTconst','primaryTitle']).size().reset_index(name='episode_cnt').sort_values(by='episode_cnt',ascending=False)
+print(ans[['parentTconst','primaryTitle','episode_cnt']].head(20))
