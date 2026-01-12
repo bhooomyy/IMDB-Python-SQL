@@ -21,3 +21,13 @@ tconst_50000_votes=title_ratings_data[title_ratings_data['numVotes']>=50000].sor
 #print(tconst_50000_votes)
 top_20_movies=pd.merge(titles_data[['tconst','titleType','primaryTitle']],tconst_50000_votes[['tconst','averageRating','numVotes']],on='tconst',how='inner')
 print(top_20_movies.head(20))
+
+
+
+#Identify titles that do not have any rating information available.
+'''empty=title_ratings_data['averageRating'].isna().any().sum()
+print(empty) '''
+#Identify titles that do not have any rating information available.
+title_leftJoin_title_ratings=pd.merge(titles_data[['tconst','titleType','primaryTitle']],title_ratings_data[['tconst','averageRating']],on='tconst',how='left')
+null_title=title_leftJoin_title_ratings[title_leftJoin_title_ratings['averageRating'].isna()]
+print(null_title[['tconst','primaryTitle','averageRating']])
