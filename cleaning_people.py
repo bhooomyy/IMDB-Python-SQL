@@ -15,3 +15,12 @@ print(cnt)
 '''
 # drop rows with missing primary name
 people_data=people_data.dropna(subset=['primaryName'])
+
+
+# death year less than birth year check, set death year to NaN if found
+mask = (
+    people_data["birthYear"].notna()
+    & people_data["deathYear"].notna()
+    & (people_data["deathYear"] < people_data["birthYear"])
+)
+people_data.loc[mask, "deathYear"] = pd.NA
