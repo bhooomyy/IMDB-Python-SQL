@@ -20,3 +20,13 @@ titles_leftJoin_titleRatings = titles_leftJoin_titleRatings.sort_values(
 titles_leftJoin_titleRatings['rank']=titles_leftJoin_titleRatings.groupby(['decade','titleType']).cumcount()+1
 top_10_titles=titles_leftJoin_titleRatings[titles_leftJoin_titleRatings['rank']<=10]
 print(top_10_titles[['titleType','primaryTitle','startYear','decade','rank','averageRating','numVotes']].sort_values(['decade','titleType','rank']).head(60))
+
+
+
+
+#Find the top 100 movies or TV series that are available under the highest number of different regional or language-specific titles.
+movie_tvshows_filter=titles_data[(titles_data['titleType']=='movie') | (titles_data['titleType']=='tvSeries')]
+titles_merge_alternates=pd.merge(movie_tvshows_filter[['tconst','titleType','primaryTitle']],title_alternates_data[['titleId','title','region','language','isOriginalTitle']],left_on='tconst',right_on='titleId',how='left')
+groupby_title=titles_merge_alternates.groupby(['tconst','titleType','primaryTitle']).agg(num_region=('region','nunique'),num_language=('language','nunique'),num_alt_titles=('titleId','count'),original_title_cnt=('isOriginalTitle','max'))
+result_2=groupby_title.sort_values(by=['num_region','num_language','num_alt_titles'],ascending=[False,False,False]).head(100)
+print(result_2)
