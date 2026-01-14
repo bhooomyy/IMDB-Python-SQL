@@ -30,3 +30,22 @@ titles_merge_alternates=pd.merge(movie_tvshows_filter[['tconst','titleType','pri
 groupby_title=titles_merge_alternates.groupby(['tconst','titleType','primaryTitle']).agg(num_region=('region','nunique'),num_language=('language','nunique'),num_alt_titles=('titleId','count'),original_title_cnt=('isOriginalTitle','max'))
 result_2=groupby_title.sort_values(by=['num_region','num_language','num_alt_titles'],ascending=[False,False,False]).head(100)
 print(result_2)
+
+
+
+#Find the most common and most successful actor–director pairings.
+actor_actress_filter_3=title_principals_data[(title_principals_data['category']=='actor') | (title_principals_data['category']=='actress')][['tconst','nconst']]
+director_split=(title_crew_data[['tconst','directors']].dropna().assign(director=lambda df: df['directors'].str.split(',')).explode('director')[['tconst','director']])
+actor_director_pair=pd.merge(director_split,actor_actress_filter_3,on='tconst',how='inner')
+pair_join_ratings=actor_director_pair.merge(title_ratings_data[['tconst','averageRating','numVotes']],on='tconst',how='inner')
+#result=pair_join_ratings.groupby(['director','tconst']).agg(num_movies_together=('tconst','nunique'),rating_median=('averageRating','median'),votes_median=('numVotes','median'))
+#print(result.sort_values(by=['num_movies_together','rating_median','votes_median'],ascending=[False,False,False]).head(100))
+tmp=pair_join_ratings.copy()
+tmp['rating_x_votes']=tmp['averageRating']*tmp['numVotes']
+result=tmp.groupby(['director','nconst']).agg(
+    num_movie_cnt=('tconst','nunique'),
+    total_votes=('numVotes','sum'),
+    rating_x_votes=('rating_x_votes','sum'))
+result['weighted_rating']=result['rating_x_votes']/result['total_votes']
+top_100=result.sort_values(by=['weighted_rating','num_movie_cnt','total_votes'],ascending=[False,False,False]).head(100)
+print(top_100)
