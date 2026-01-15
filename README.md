@@ -168,3 +168,26 @@ At the intermediate stage, the project moves beyond descriptive statistics into 
 
 
 
+## Advanced Analysis
+
+The advanced stage introduces weighted metrics and career-aware analytics, focusing on relative performance rather than absolute thresholds.
+
+### Actor–Director Collaboration Analysis
+- Filtered actor/actress credits from `title.principals`
+- Normalized multi-director titles using split + explode
+- Created actor–director pairs per title and joined ratings data
+- Computed success metrics per (director, actor):
+  - `num_movie_cnt` (unique shared titles)
+  - `total_votes` (sum of votes)
+  - `weighted_rating` = sum(`averageRating` × `numVotes`) / sum(`numVotes`)
+- Ranked and extracted the top 100 actor–director pairings by `weighted_rating`, then collaboration count and votes
+
+### Breakout Performance Detection (Popularity Surge)
+- Built chronological filmographies per actor/actress using `startYear`
+- Computed rolling baselines over the previous 5 titles (shifted to avoid leakage):
+  - `baseline_votes` (rolling mean of votes)
+  - `baseline_rating` (rolling mean of ratings)
+- Flagged breakout titles where:
+  - `numVotes` ≥ 3 × `baseline_votes`
+  - `averageRating` ≥ `baseline_rating`
+- Selected the first breakout title per actor/actress and printed key comparison metrics
