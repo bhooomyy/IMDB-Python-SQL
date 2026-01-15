@@ -146,13 +146,25 @@ At this stage, the project demonstrates:
 
 ---
 
-## Planned Next Steps (Intermediate Level)
+## Intermediate Analysis 
 
-- Top 10 titles per decade by `titleType`
-- Tie-breaking using `numVotes`
-- Weighted rating calculations
-- Advanced group-by and window-style analysis
-- SQL schema design and data loading
-- Re-implementation of analysis using SQL queries
+At the intermediate stage, the project moves beyond descriptive statistics into ranking, aggregation, and multi-dimensional comparisons, closely mirroring real-world SQL analytics problems.
+
+### Decade-Based Title Rankings
+- Ranked titles per decade and per `titleType`
+- Used `averageRating` as the primary ranking metric
+- Applied `numVotes` as a deterministic tie-breaker
+- Implemented SQL-style window logic using ordered sorting + `groupby().cumcount()` (ROW_NUMBER equivalent)
+- Extracted top 10 titles per decade per title type
+
+### Regional & Language Reach Analysis
+- Focused on movies and TV series only
+- Joined core title metadata with alternate title data
+- Measured international reach using:
+  - Distinct regions
+  - Distinct languages
+  - Total alternate title records
+- Ranked and extracted the top 100 titles with the widest regional and language coverage
+
 
 
