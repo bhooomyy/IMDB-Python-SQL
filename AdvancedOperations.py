@@ -21,3 +21,23 @@ breakouts=merge_ratings[merge_ratings['baseline_votes'].notna()&merge_ratings['b
 first_breakout=breakouts.sort_values(by=['nconst','startYear']).groupby('nconst').first()
 print(first_breakout[['nconst','startYear','primaryTitle','averageRating','numVotes','baseline_rating','baseline_votes']].head(50))
 
+
+
+
+
+# Detect TV series with broken episode continuity (duplicates, gaps, missing episode numbers) and rank the top 50 series by anomaly severity.
+tvseries_filter=titles_data[titles_data['titleType']=='tvSeries']
+title_join_episode=tvseries_filter.merge(title_episode_data,left_on='tconst',right_on='parentTconst',how='inner').sort_values(by=['seasonNumber','episodeNumber'],ascending=[True,True])
+#result_2_adv=title_join_episode[(title_join_episode['seasonNumber'].isna()) | (title_join_episode['episodeNumber'].isna()) | (title_join_episode['seasonNumber'].isna()) | (title_join_episode['episodeNumber']==0.0)]
+def missing_eps(s):
+    invalid=s[s.isna() | s<=0.0].tolist()
+    valid=s.dropna()
+    valid=valid[valid>0].astype(int)
+    if valid.empty:
+        return invalid
+    expected=set(range(valid.min(),valid.max()+1))
+    missing=sorted(expected-set(valid))
+    return missing+invalid
+missing_episodes=title_join_episode.groupby(['parentTconst','primaryTitle','seasonNumber'])['episodeNumber'].apply(missing_eps).reset_index(name='missing_episode')
+anomaly=missing_episodes[missing_episodes['missing_episode'].str.len()>0]
+print(anomaly.head(50))
