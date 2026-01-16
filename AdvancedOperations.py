@@ -99,3 +99,45 @@ result=genre_merge_ratings.groupby(['decade','genre','titleType']).agg(
 result['decade_total_vote']=result.groupby(['decade','titleType'])['total_votes'].transform('sum')
 result['vote_share']=result['total_votes']/result['decade_total_vote']
 print(result.sort_values(by=['decade','vote_share'],ascending=[True,False]).head(60))
+
+
+
+
+
+
+
+# Find the top 100 actors/actresses ranked by total audience votes across all titles they appeared in, and show their vote-weighted average rating.
+# For each actor/actress, find their top 3 genres by total votes, and label them as “specialist” (one genre dominates) or “crossover” (votes spread across genres).
+actor_actress_filter=title_principals_data[(title_principals_data['category']=='actor')|(title_principals_data['category']=='actress')]
+actor_actress_filter=actor_actress_filter.merge(people_data[['nconst','primaryName']],on='nconst',how='left')
+actor_merger_rating=actor_actress_filter[['tconst','nconst','primaryName','category']].merge(title_ratings_data,on='tconst',how='inner')
+actor_merger_rating = actor_merger_rating.drop_duplicates(subset=['tconst','nconst'])
+actor_merger_rating['rating_x_votes']=actor_merger_rating['averageRating']*actor_merger_rating['numVotes']
+result_1=actor_merger_rating.groupby(['nconst','primaryName']).agg(
+    total_titles=('tconst','nunique'),
+    total_votes=('numVotes','sum'),
+    total_rating_x_votes=('rating_x_votes','sum')
+)
+result_1['weighted_rating']=result_1['total_rating_x_votes']/result_1['total_votes']
+#print('##### result_1 #####')
+#print(result_1.sort_values(by=['total_votes','weighted_rating'],ascending=[False,False]).head(100))
+#print('##### result_2 #####')
+genres_split=titles_data[['tconst','titleType','primaryTitle','genres']].dropna(subset=['genres']).assign(genre=lambda df:df['genres'].str.split(',')).explode('genre')[['tconst','titleType','primaryTitle','genre']]
+refined_result_1=actor_merger_rating[['tconst','nconst','primaryName','numVotes']].drop_duplicates(['nconst','tconst'])
+result_1_merge_genre=refined_result_1.merge(genres_split,on='tconst',how='inner').groupby(['nconst','primaryName','genre']).agg(total_votes=('numVotes','sum')).reset_index()
+
+result_1_merge_genre=result_1_merge_genre.sort_values(['nconst', 'total_votes'],ascending=[True, False])
+result_1_merge_genre['rank']=result_1_merge_genre.groupby('nconst').cumcount()+1
+result_2=result_1_merge_genre[result_1_merge_genre['rank']<=3].sort_values(by=['nconst','rank','genre'])
+
+
+actor_total_votes=(result_1_merge_genre.groupby('nconst').agg(actor_total_votes=('total_votes','sum')))
+top_genre_votes = (result_1_merge_genre[result_1_merge_genre['rank'] == 1][['nconst', 'total_votes']].rename(columns={'total_votes': 'top_genre_votes'}))
+actor_label = actor_total_votes.merge(top_genre_votes, on='nconst', how='left')
+actor_label['top_genre_share'] = actor_label['top_genre_votes'] / actor_label['actor_total_votes']
+
+SPECIALIST_THRESHOLD = 0.70
+actor_label['label'] = 'crossover'
+actor_label.loc[actor_label['top_genre_share'] >= SPECIALIST_THRESHOLD, 'label'] = 'specialist'
+result_2 = result_2.merge(actor_label[['nconst', 'label', 'top_genre_share']], on='nconst', how='left')
+print(result_2.head(50))
