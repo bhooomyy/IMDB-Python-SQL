@@ -182,6 +182,8 @@ The advanced stage introduces weighted metrics and career-aware analytics, focus
   - `weighted_rating` = sum(`averageRating` × `numVotes`) / sum(`numVotes`)
 - Ranked and extracted the top 100 actor–director pairings by `weighted_rating`, then collaboration count and votes
 
+---
+
 ### Breakout Performance Detection (Popularity Surge)
 - Built chronological filmographies per actor/actress using `startYear`
 - Computed rolling baselines over the previous 5 titles (shifted to avoid leakage):
@@ -191,3 +193,48 @@ The advanced stage introduces weighted metrics and career-aware analytics, focus
   - `numVotes` ≥ 3 × `baseline_votes`
   - `averageRating` ≥ `baseline_rating`
 - Selected the first breakout title per actor/actress and printed key comparison metrics
+
+---
+
+### TV Series Episode Continuity Validation
+- Detected episode numbering anomalies per season:
+  - Missing episodes
+  - Gaps in episode sequence
+  - Invalid episode numbers (null / ≤ 0)
+- Identified series with broken continuity
+- Prepared data for severity-based ranking
+
+---
+
+### Writer–Director Overlap (“Single-Author” Titles)
+- Identified titles where at least one person is both writer and director
+- Computed prevalence by `titleType` and `genre`
+- Compared success metrics between:
+  - Single-author titles
+  - Non-single-author titles
+- Measured audience impact using votes and weighted ratings
+
+---
+
+## Current Coverage Summary
+
+This project demonstrates:
+
+- Real-world IMDb data handling
+- Advanced pandas aggregation and window-style logic
+- Vote-weighted performance metrics
+- Career-level analytics (actors, directors, collaborations)
+- Data-quality validation and anomaly detection
+- Strong foundation for SQL translation and optimization
+
+---
+
+## Next Steps
+
+- Translate core analyses into **PostgreSQL SQL**
+- Use:
+  - CTEs
+  - Window functions
+  - Index-aware query design
+- Add query performance comparisons (Python vs SQL)
+- Expand documentation with ER diagrams and schema notes
