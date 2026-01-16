@@ -77,3 +77,25 @@ success = success.reset_index()
 print("\n=== Single-Author Prevalence by Title Type & Genre ===\n",how_common.sort_values(['single_auth_rate','total_title'], ascending=[False, False]).head(20))
 print("\n=== Single-Author Titles (Writer = Director) ===\n",success[success['is_single_auth']].sort_values(['weighted_rating','total_votes'], ascending=[False, False]).head(20))
 print("\n=== Non-Single-Author Titles (Writer ≠ Director) ===\n",success[~success['is_single_auth']].sort_values(['weighted_rating','total_votes'], ascending=[False, False]).head(20))
+
+
+
+
+
+
+'''For each decade, find which genres were most popular and how their popularity increased or decreased compared to the previous decade, 
+using audience votes and ratings.'''
+titles_data['decade']=(titles_data['startYear']//10)*10
+genres_split=titles_data[['tconst','titleType','primaryTitle','genres','startYear','decade']].dropna(subset=['genres']).assign(genre=lambda df:df['genres'].str.split(',')).explode('genre')[['tconst','titleType','primaryTitle','genre','startYear','decade']]
+
+genre_merge_ratings=pd.merge(genres_split[['tconst','titleType','primaryTitle','genre','startYear','decade']],title_ratings_data[['tconst','averageRating','numVotes']],on='tconst',how='inner')
+genre_merge_ratings['rating_x_votes']=genre_merge_ratings['averageRating']*genre_merge_ratings['numVotes']
+
+result=genre_merge_ratings.groupby(['decade','genre','titleType']).agg(
+    total_title=('tconst','nunique'),
+    total_votes=('numVotes','sum'),
+    rating_x_votes_sum=('rating_x_votes','sum')
+)
+result['decade_total_vote']=result.groupby(['decade','titleType'])['total_votes'].transform('sum')
+result['vote_share']=result['total_votes']/result['decade_total_vote']
+print(result.sort_values(by=['decade','vote_share'],ascending=[True,False]).head(60))
