@@ -41,3 +41,39 @@ def missing_eps(s):
 missing_episodes=title_join_episode.groupby(['parentTconst','primaryTitle','seasonNumber'])['episodeNumber'].apply(missing_eps).reset_index(name='missing_episode')
 anomaly=missing_episodes[missing_episodes['missing_episode'].str.len()>0]
 print(anomaly.head(50))
+
+
+
+
+
+# Identify titles where at least one person is credited as both a writer and a director, then measure how common and how successful these titles are by content type and genre.
+genre_split=titles_data[['tconst','titleType','genres']].dropna(subset=['genres']).assign(genre=lambda df:df['genres'].str.split(',')).explode('genre')[['tconst','titleType','genre']]
+director_split=title_crew_data[['tconst','directors']].dropna().assign(director=lambda df:df['directors'].str.split(',')).explode('director')[['tconst','director']]
+writer_split=title_crew_data[['tconst','writers']].dropna().assign(writer=lambda df:df['writers'].str.split(',')).explode('writer')[['tconst','writer']]
+
+director_writer_overlap=director_split.merge(writer_split,left_on=['tconst','director'],right_on=['tconst','writer'],how='inner')
+
+single_auth=director_writer_overlap['tconst'].dropna().unique()
+title_meta=genre_split.copy()
+title_meta['is_single_auth']=title_meta['tconst'].isin(single_auth)
+
+how_common=title_meta.groupby(['titleType','genre']).agg(
+    total_title=('tconst','nunique'),
+    is_single_auth_cnt=('is_single_auth','sum')
+)
+how_common['single_auth_rate']=how_common['is_single_auth_cnt']/how_common['total_title']
+
+title_meta_merge_rating=title_meta.merge(title_ratings_data,on=['tconst'],how='left')
+title_meta_merge_rating['rating_x_votes']=title_meta_merge_rating['averageRating']*title_meta_merge_rating['numVotes']
+success=title_meta_merge_rating.groupby(['titleType','genre','is_single_auth']).agg(
+    total_titles=('tconst','nunique'),
+    total_votes=('numVotes','sum'),
+    total_rating_x_votes=('rating_x_votes','sum')
+)
+success['weighted_rating']=success['total_rating_x_votes']/success['total_votes'].replace(0, pd.NA)
+how_common = how_common.reset_index()
+success = success.reset_index()
+
+print("\n=== Single-Author Prevalence by Title Type & Genre ===\n",how_common.sort_values(['single_auth_rate','total_title'], ascending=[False, False]).head(20))
+print("\n=== Single-Author Titles (Writer = Director) ===\n",success[success['is_single_auth']].sort_values(['weighted_rating','total_votes'], ascending=[False, False]).head(20))
+print("\n=== Non-Single-Author Titles (Writer ≠ Director) ===\n",success[~success['is_single_auth']].sort_values(['weighted_rating','total_votes'], ascending=[False, False]).head(20))
