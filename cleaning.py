@@ -1,7 +1,7 @@
 import pandas as pd 
 
 ############# cleaning people.tsv ##############
-people_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/people.tsv',sep='\t',na_values=["\\N", ""])
+people_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/people.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 #print(people_data.head())
 #print(people_data.isna().sum())
 '''
@@ -49,35 +49,35 @@ print(merge_primaryProfession.head(60))
 
 
 ############### cleaning titlealternates.tsv #################
-title_alternates_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_alternates.tsv',sep='\t',na_values=["\\N", ""])
+title_alternates_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_alternates.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 duplicates=title_alternates_data[title_alternates_data.duplicated(subset=['titleId','ordering'],keep=False)].sort_values(by=['titleId','ordering'])
 print(duplicates.head(60))      #Empty
 
 
 ############### cleaning title_crew.tsv #################
-title_crew_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_crew.tsv',sep='\t',na_values=["\\N", ""])
+title_crew_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_crew.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 empty=title_crew_data.isna().any()
 #title_crew_data=title_crew_data.dropna(subset=['tconst'])
 print(empty)        #empty
 
 
 ################ cleaning title_episode.tsv #################
-title_episode_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_episode.tsv',sep='\t',na_values=["\\N", ""])
+title_episode_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_episode.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 duplicate_title_episode=title_episode_data[title_episode_data.duplicated(subset=['tconst','parentTconst','seasonNumber','episodeNumber'],keep=False)].sort_values(by=['tconst','parentTconst'])
 empty=title_episode_data.isna().any()
 print(empty)        #empty
 
 
 ################ cleaning title_principals.tsv #################
-title_principals_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_principals.tsv',sep='\t',na_values=["\\N", ""])
+title_principals_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_principals.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 title_episode_data=title_episode_data.dropna(subset=['tconst'])
 
 
 ################# cleaning title_ratings.tsv #################
-title_ratings_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_ratings.tsv',sep='\t',na_values=["\\N", ""])
+title_ratings_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/title_ratings.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 title_ratings_data=title_ratings_data.dropna(subset=['tconst'])
 
 
 ################# cleaning titles.tsv #################
-titles_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/titles.tsv',sep='\t',na_values=["\\N", ""])
+titles_data=pd.read_csv('/Users/bhoomi/Documents/IMDBdataset/titles.tsv',sep='\t',na_values=["\\N", ""],low_memory=True)
 titles_data=titles_data.dropna(subset=['tconst'])

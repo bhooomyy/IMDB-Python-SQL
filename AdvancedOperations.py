@@ -1,5 +1,5 @@
 import pandas as pd
-from cleaning import people_data,title_alternates_data,title_crew_data,title_episode_data,title_principals_data,title_ratings_data,titles_data
+from cleaning import people_data,title_crew_data,title_episode_data,title_principals_data,title_ratings_data,titles_data
 
 #Identify, for each actor or actress, the first movie or TV title or any titleType where their popularity significantly increased compared to their previous work.
 #For each actor or actress, find the earliest title where the number of votes is at least three times higher than their recent average and the rating is not worse than their prior work.
