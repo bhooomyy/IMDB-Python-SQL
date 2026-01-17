@@ -7,3 +7,6 @@ select titleType,count(*) as cnt from titles group by titleType order by cnt des
 
 -- Find the top 20 highest-rated titles that have received at least 50,000 votes.
 select t.primaryTitle,t.titleType,r.averageRating,r.numVotes from titles t left join title_rating r on t.tconst=r.tconst where r.numVotes>=50000 order by r.averageRating desc limit 20;
+
+-- Identify titles that do not have any rating information available.
+select t.tconst, t.primaryTitle from titles t where not exists (select 1 from title_rating r where r.tconst = t.tconst);
