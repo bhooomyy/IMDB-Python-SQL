@@ -216,25 +216,15 @@ The advanced stage introduces weighted metrics and career-aware analytics, focus
 
 ---
 
-## Current Coverage Summary
 
-This project demonstrates:
+## SQL Extension (MySQL)
 
-- Real-world IMDb data handling
-- Advanced pandas aggregation and window-style logic
-- Vote-weighted performance metrics
-- Career-level analytics (actors, directors, collaborations)
-- Data-quality validation and anomaly detection
-- Strong foundation for SQL translation and optimization
+This project extends the existing Python-based analysis with a full SQL implementation using MySQL 8+, focusing on real-world analytical query design and optimization.
 
----
-
-## Next Steps
-
-- Translate core analyses into **PostgreSQL SQL**
-- Use:
-  - CTEs
-  - Window functions
-  - Index-aware query design
-- Add query performance comparisons (Python vs SQL)
-- Expand documentation with ER diagrams and schema notes
+### SQL Features Used
+- Common Table Expressions (CTEs)
+- Window functions (`ROW_NUMBER`)
+- Aggregate functions
+- Vote-weighted metrics
+- Recursive CTEs for normalization
+- Index-aware joins
