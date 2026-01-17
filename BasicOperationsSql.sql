@@ -14,3 +14,6 @@ select t.tconst, t.primaryTitle from titles t where not exists (select 1 from ti
 -- For each TV series, calculate the total number of episodes and list the top 20 series with the most episodes.
 with t1 as(select parentTconst,count(*) as num_episodes from title_episode group by parentTconst)
 select t.tconst,t.primaryTitle,t1.num_episodes from titles t join t1 on t.tconst=t1.parentTconst where t.titleType='tvSeries' order by t1.num_episodes desc limit 20;
+
+-- List the top 20 people who have appeared in the highest number of titles as an actor or actress.
+select p.nconst,pe.primaryName,count(distinct p.tconst) as num_titles from title_principal p join people pe on pe.nconst = p.nconst where p.category in ('actor','actress') group by p.nconst, pe.primaryName order by num_titles desc limit 20;
