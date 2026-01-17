@@ -10,3 +10,7 @@ select t.primaryTitle,t.titleType,r.averageRating,r.numVotes from titles t left 
 
 -- Identify titles that do not have any rating information available.
 select t.tconst, t.primaryTitle from titles t where not exists (select 1 from title_rating r where r.tconst = t.tconst);
+
+-- For each TV series, calculate the total number of episodes and list the top 20 series with the most episodes.
+with t1 as(select parentTconst,count(*) as num_episodes from title_episode group by parentTconst)
+select t.tconst,t.primaryTitle,t1.num_episodes from titles t join t1 on t.tconst=t1.parentTconst where t.titleType='tvSeries' order by t1.num_episodes desc limit 20;
